@@ -23,6 +23,7 @@ export enum SOCKET_EVENTS {
     ANSWER_QUESTION = "answer_question",
     QUESTION_ANSWERED = "question_answered",
     INVALID_QUESTION_NUMBER = "invalid_question_number",
+    PLAYER_FINISHED = "player_finished",
 }
 
 interface Question {
@@ -47,6 +48,7 @@ interface GameSettings {
     numberOfQuestions: number
     questionTypes: Array<QuestionTypes>
     maxPlayers: number
+    timeLimit: number // in seconds
 }
 
 interface GameRoom {
@@ -54,6 +56,7 @@ interface GameRoom {
     players: Player[]
     host: Player
     isGameStarted: boolean
+    numPlayersFinished: number
     settings: GameSettings
 }
 

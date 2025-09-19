@@ -34,7 +34,8 @@ io.on("connection", (socket) => {
             settings: {
                 numberOfQuestions: 10,
                 questionTypes: [QuestionTypes.alwaysIncorrect, QuestionTypes.unknownCorrectness, QuestionTypes.selectIncorrectCode, QuestionTypes.selectCorrectCode],
-                maxPlayers: 4
+                maxPlayers: 4,
+                timeLimit: 900
             }
         }
         socket.join(roomCode);
@@ -80,6 +81,9 @@ io.on("connection", (socket) => {
         gameState[roomCode].isGameStarted = true;
         // game started, send the first question to all players
         socket.to(roomCode).emit(SOCKET_EVENTS.GAME_STARTED, gameState[roomCode].questions[0]);
+        setTimeout(() => {
+            socket.to(roomCode).emit(SOCKET_EVENTS.GAME_ENDED, roomCode);
+        }, gameState[roomCode].settings.timeLimit * 1000);
     })
 
     socket.on(SOCKET_EVENTS.ANSWER_QUESTION, (roomCode: string, questionNumber: number, answer: number[]) => {
@@ -101,8 +105,17 @@ io.on("connection", (socket) => {
             playerAnswer: answer,
             isCorrect: isCorrect
         });
-
-        socket.emit(SOCKET_EVENTS.QUESTION_ANSWERED, roomCode, questionNumber, isCorrect);
+        let nextQuestion;
+        if (questionNumber === gameState[roomCode].questions.length - 1) {
+            nextQuestion = null;
+            gameState[roomCode].numPlayersFinished++;
+        } else {
+            nextQuestion = gameState[roomCode].questions[questionNumber + 1];
+        }
+        socket.emit(SOCKET_EVENTS.QUESTION_ANSWERED, roomCode, questionNumber, isCorrect, nextQuestion);
+        if (gameState[roomCode].numPlayersFinished === gameState[roomCode].players.length) {
+            socket.to(roomCode).emit(SOCKET_EVENTS.GAME_ENDED, roomCode);
+        }
     })
     
 
