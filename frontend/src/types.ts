@@ -17,3 +17,11 @@ export const SOCKET_EVENTS = {
     INVALID_QUESTION_NUMBER: "invalid_question_number",
     PLAYER_FINISHED: "player_finished",
 }
+
+
+export interface Question {
+    question: string
+    code: string
+    playerAnswer: number[] | null
+    isCorrect: boolean | null
+}

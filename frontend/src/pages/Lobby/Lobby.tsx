@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import PlayerSidebar from '../../components/PlayerSideBar/PlayerSidebar.tsx';
 import GameSettings from '../../components/GameSettings/GameSettings.tsx';
 import './Lobby.css';
+import { SOCKET_EVENTS } from '../../types.ts';
 
 interface Player {
   name: string;
@@ -17,7 +18,7 @@ interface GameSettingsData {
   timeLimit: number;
 }
 
-export default function Lobby() {
+export default function Lobby( { socketRef, currentRoomCode } : any) {
   const [players, setPlayers] = useState<Player[]>([
     { name: 'You', socketId: 'host-123', isHost: true },
     { name: 'Alice', socketId: 'player-456' },
@@ -34,7 +35,7 @@ export default function Lobby() {
 
   const handleStartGame = () => {
     console.log('Starting game with settings:', gameSettings);
-    // TODO: Implement game start logic
+    socketRef.current?.emit(SOCKET_EVENTS.START_GAME, currentRoomCode);
   };
 
   const handleInvite = async () => {

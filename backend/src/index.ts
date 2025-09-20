@@ -20,7 +20,18 @@ function generateRoomCode(gameState: GameState): string {
     } while (roomCode in gameState);
     return roomCode;
 }
-
+const questions = [ 
+    {
+        question: "Where is the bug in this code? ",
+        code: "console.log('Paris')\n const a = 1;\n const b = 2;\n const c = a + b;",
+        answer: [1]
+    },
+    {
+        question: "Where is the bug in this code? ",
+        code: "console.log('Berlin')\n const a = 1;\n const b = 2;\n const c = a + b;",
+        answer: [2]
+    }
+]
 io.on("connection", (socket) => {
     console.log("A user connected", socket.id);
 
@@ -33,7 +44,7 @@ io.on("connection", (socket) => {
             timeTaken: null
         }
         gameState[roomCode] = {
-            questions: [],
+            questions: questions,
             players: [host],
             host: host,
             isGameStarted: false,
@@ -87,8 +98,10 @@ io.on("connection", (socket) => {
             return;
         }
         gameState[roomCode].isGameStarted = true;
+        console.log("Game started", gameState[roomCode]);
         // game started, send the first question to all players
-        socket.to(roomCode).emit(SOCKET_EVENTS.GAME_STARTED, gameState[roomCode].questions[0]);
+        // socket.to(roomCode).emit(SOCKET_EVENTS.GAME_STARTED, gameState[roomCode].questions[0]);
+        socket.emit(SOCKET_EVENTS.GAME_STARTED, gameState[roomCode].questions[0]);
         setTimeout(() => {
             socket.to(roomCode).emit(SOCKET_EVENTS.GAME_ENDED, roomCode);
         }, gameState[roomCode].settings.timeLimit * 1000);
