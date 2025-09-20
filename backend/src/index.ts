@@ -3,7 +3,13 @@ import { GameState, Player, QuestionTypes, SOCKET_EVENTS } from './types';
 
 const PORT: number = parseInt(process.env.PORT || "4000");
 
-const io = new Server(PORT, {})
+const io = new Server(PORT, {
+  cors: {
+    origin: "http://localhost:5173", // Vite's default dev server port
+    methods: ["GET", "POST"],
+    credentials: true
+  }
+})
 const gameState: GameState = {}
 
 
@@ -39,6 +45,7 @@ io.on("connection", (socket) => {
                 timeLimit: 900
             }
         }
+        console.log("Room created", gameState);
         socket.join(roomCode);
         socket.emit(SOCKET_EVENTS.ROOM_CREATED, roomCode);
     })
