@@ -115,6 +115,7 @@ io.on("connection", (socket) => {
             socket.emit(SOCKET_EVENTS.INVALID_QUESTION_NUMBER, roomCode);
             return;
         }
+        console.log("Answer received", answer);
         const player = gameState[roomCode].players.find(player => player.socketId === socket.id);
         if (!player) {
             return;
@@ -131,7 +132,9 @@ io.on("connection", (socket) => {
             gameState[roomCode].numPlayersFinished++;
         } else {
             nextQuestion = gameState[roomCode].questions[questionNumber + 1];
+            console.log("Next question", nextQuestion);
         }
+        
         socket.emit(SOCKET_EVENTS.QUESTION_ANSWERED, roomCode, questionNumber, isCorrect, nextQuestion);
         if (gameState[roomCode].numPlayersFinished === gameState[roomCode].players.length) {
             io.to(roomCode).emit(SOCKET_EVENTS.GAME_ENDED, roomCode);

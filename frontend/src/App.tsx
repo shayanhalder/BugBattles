@@ -61,6 +61,11 @@ function App() {
       setGameStarted(true)
     })
 
+    socketRef.current.on(SOCKET_EVENTS.QUESTION_ANSWERED, (roomCode: string, questionNumber: number, isCorrect: boolean, nextQuestion: Question) => {
+      console.log('Next question:', nextQuestion)
+      setQuestions([...questions, nextQuestion])
+    })
+
     return () => {
       if (socketRef.current) {
         socketRef.current.disconnect()
