@@ -100,10 +100,9 @@ io.on("connection", (socket) => {
         gameState[roomCode].isGameStarted = true;
         console.log("Game started", gameState[roomCode]);
         // game started, send the first question to all players
-        // socket.to(roomCode).emit(SOCKET_EVENTS.GAME_STARTED, gameState[roomCode].questions[0]);
-        socket.emit(SOCKET_EVENTS.GAME_STARTED, gameState[roomCode].questions[0]);
+        io.to(roomCode).emit(SOCKET_EVENTS.GAME_STARTED, gameState[roomCode].questions[0]);
         setTimeout(() => {
-            socket.to(roomCode).emit(SOCKET_EVENTS.GAME_ENDED, roomCode);
+            io.to(roomCode).emit(SOCKET_EVENTS.GAME_ENDED, roomCode);
         }, gameState[roomCode].settings.timeLimit * 1000);
     })
 
@@ -135,7 +134,7 @@ io.on("connection", (socket) => {
         }
         socket.emit(SOCKET_EVENTS.QUESTION_ANSWERED, roomCode, questionNumber, isCorrect, nextQuestion);
         if (gameState[roomCode].numPlayersFinished === gameState[roomCode].players.length) {
-            socket.to(roomCode).emit(SOCKET_EVENTS.GAME_ENDED, roomCode);
+            io.to(roomCode).emit(SOCKET_EVENTS.GAME_ENDED, roomCode);
         }
     })
     

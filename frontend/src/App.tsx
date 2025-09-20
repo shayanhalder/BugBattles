@@ -36,6 +36,7 @@ function App() {
 
     socketRef.current.on(SOCKET_EVENTS.ROOM_CREATED, (roomCode: string) => {
       console.log('Room created:', roomCode)
+      // socketRef.current?.join(roomCode)
       setCurrentRoomCode(roomCode)
     })
 
@@ -81,7 +82,6 @@ function App() {
     }
   }
 
-
   const renderCurrentView = () => {
     const viewMap = {
       home: !currentRoomCode && !gameStarted,
@@ -94,7 +94,6 @@ function App() {
     return <Home mode={mode} setMode={setMode} name={name} setName={setName} roomCode={roomCode} setRoomCode={setRoomCode} currentRoomCode={currentRoomCode} setCurrentRoomCode={setCurrentRoomCode} handleCreateRoom={handleCreateRoom} handleJoinRoom={handleJoinRoom}/>;
   };
 
-  
 
   return (
     <div className="app">
