@@ -1,12 +1,6 @@
-// import { useState } from 'react'
-import '../App.css'
+import './Home.css'
 
 export default function Home({ mode, setMode, name, setName, roomCode, setRoomCode, currentRoomCode, setCurrentRoomCode, handleCreateRoom, handleJoinRoom } : any ) {
-//   const [mode, setMode] = useState<'create' | 'join'>('create')
-//   const [name, setName] = useState('')
-//   const [roomCode, setRoomCode] = useState('')
-//   const [currentRoomCode, setCurrentRoomCode] = useState('')
-
   return (
     <div className="main-panel">
         <div className="mode-toggle">

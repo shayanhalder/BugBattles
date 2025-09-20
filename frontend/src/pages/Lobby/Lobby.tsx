@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import PlayerSidebar from '../components/PlayerSideBar/PlayerSidebar.tsx';
-import GameSettings from '../components/GameSettings/GameSettings.tsx';
+import PlayerSidebar from '../../components/PlayerSideBar/PlayerSidebar.tsx';
+import GameSettings from '../../components/GameSettings/GameSettings.tsx';
 import './Lobby.css';
 
 interface Player {

@@ -3,8 +3,8 @@ import './App.css'
 import { io, Socket } from "socket.io-client";
 import { SOCKET_EVENTS } from './types'
 // import Question from './components/Question/Question'
-import Lobby from './pages/Lobby';
-import Home from './pages/Home';
+import Lobby from './pages/Lobby/Lobby';
+import Home from './pages/Home/Home';
 
 function App() {
   const [mode, setMode] = useState<'create' | 'join'>('create')
