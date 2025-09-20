@@ -1,34 +1,74 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [mode, setMode] = useState<'create' | 'join'>('create')
+  const [name, setName] = useState('')
+  const [roomCode, setRoomCode] = useState('')
+
+  const handleCreateRoom = () => {
+    if (name.trim()) {
+      console.log('Creating room with name:', name)
+      // TODO: Implement room creation logic
+    }
+  }
+
+  const handleJoinRoom = () => {
+    if (name.trim() && roomCode.trim()) {
+      console.log('Joining room:', roomCode, 'with name:', name)
+      // TODO: Implement room joining logic
+    }
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="app">
+      <h1 className="title">BugBattles</h1>
+      
+      <div className="main-panel">
+        <div className="mode-toggle">
+          <button 
+            className={`mode-button ${mode === 'create' ? 'active' : ''}`}
+            onClick={() => setMode('create')}
+          >
+            Create room
+          </button>
+          <button 
+            className={`mode-button ${mode === 'join' ? 'active' : ''}`}
+            onClick={() => setMode('join')}
+          >
+            Join room
+          </button>
+        </div>
+
+        <div className="form-section">
+          <input
+            type="text"
+            placeholder="Enter your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="input-field"
+          />
+          
+          {mode === 'join' && (
+            <input
+              type="text"
+              placeholder="Enter room code"
+              value={roomCode}
+              onChange={(e) => setRoomCode(e.target.value)}
+              className="input-field"
+            />
+          )}
+
+          <button 
+            className="action-button"
+            onClick={mode === 'create' ? handleCreateRoom : handleJoinRoom}
+            disabled={!name.trim() || (mode === 'join' && !roomCode.trim())}
+          >
+            {mode === 'create' ? 'Create Room' : 'Join Room'}
+          </button>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </div>
   )
 }
 

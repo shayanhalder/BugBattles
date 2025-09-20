@@ -1,7 +1,7 @@
 import { Server } from "socket.io";
 import { GameState, Player, QuestionTypes, SOCKET_EVENTS } from './types';
 
-const PORT: number = parseInt(process.env.PORT || "3000");
+const PORT: number = parseInt(process.env.PORT || "4000");
 
 const io = new Server(PORT, {})
 const gameState: GameState = {}
@@ -31,6 +31,7 @@ io.on("connection", (socket) => {
             players: [host],
             host: host,
             isGameStarted: false,
+            numPlayersFinished: 0,
             settings: {
                 numberOfQuestions: 10,
                 questionTypes: [QuestionTypes.alwaysIncorrect, QuestionTypes.unknownCorrectness, QuestionTypes.selectIncorrectCode, QuestionTypes.selectCorrectCode],
