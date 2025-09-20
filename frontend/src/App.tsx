@@ -2,6 +2,9 @@ import { useState, useEffect, useRef } from 'react'
 import './App.css'
 import { io, Socket } from "socket.io-client";
 import { SOCKET_EVENTS } from './types'
+// import Question from './components/Question/Question'
+import Lobby from './pages/Lobby';
+import Home from './pages/Home';
 
 function App() {
   const [mode, setMode] = useState<'create' | 'join'>('create')
@@ -11,12 +14,11 @@ function App() {
   const socketRef = useRef<Socket | null>(null)
 
   useEffect(() => {
-    // Initialize socket connection only once when component mounts
+    // initialize socket connection only once when component mounts
     socketRef.current = io('http://localhost:4000', {
       transports: ['websocket', 'polling']
     })
 
-    // Set up event listeners
     socketRef.current.on('connect', () => {
       console.log('Connected to server:', socketRef.current?.id)
     })
@@ -50,13 +52,12 @@ function App() {
       alert('You are not authorized to perform this action.')
     })
 
-    // Cleanup on unmount
     return () => {
       if (socketRef.current) {
         socketRef.current.disconnect()
       }
     }
-  }, []) // Empty dependency array means this only runs once on mount
+  }, [])
 
   const handleCreateRoom = () => {
     if (socketRef.current && name.trim()) {
@@ -75,58 +76,8 @@ function App() {
   return (
     <div className="app">
       <h1 className="title">BugBattles</h1>
-      
-      <div className="main-panel">
-        <div className="mode-toggle">
-          <button 
-            className={`mode-button ${mode === 'create' ? 'active' : ''}`}
-            onClick={() => setMode('create')}
-          >
-            Create room
-          </button>
-          <button 
-            className={`mode-button ${mode === 'join' ? 'active' : ''}`}
-            onClick={() => setMode('join')}
-          >
-            Join room
-          </button>
-        </div>
-
-        <div className="form-section">
-          <input
-            type="text"
-            placeholder="Enter your name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="input-field"
-          />
-          
-          {mode === 'join' && (
-            <input
-              type="text"
-              placeholder="Enter room code"
-              value={roomCode}
-              onChange={(e) => setRoomCode(e.target.value)}
-              className="input-field"
-            />
-          )}
-
-          <button 
-            className="action-button"
-            onClick={mode === 'create' ? handleCreateRoom : handleJoinRoom}
-            disabled={!name.trim() || (mode === 'join' && !roomCode.trim())}
-          >
-            {mode === 'create' ? 'Create Room' : 'Join Room'}
-          </button>
-
-          {currentRoomCode && (
-            <div className="room-info">
-              <p>Room Code: <strong>{currentRoomCode}</strong></p>
-              <p>Share this code with other players to join!</p>
-            </div>
-          )}
-        </div>
-      </div>
+      { currentRoomCode ? <Lobby /> : <Home mode={mode} setMode={setMode} name={name} setName={setName} roomCode={roomCode} setRoomCode={setRoomCode} currentRoomCode={currentRoomCode} setCurrentRoomCode={setCurrentRoomCode} handleCreateRoom={handleCreateRoom} handleJoinRoom={handleJoinRoom}/>}
+      {/* <Question question="What is the capital of France?" code="console.log('Paris')" /> */}
     </div>
   )
 }
