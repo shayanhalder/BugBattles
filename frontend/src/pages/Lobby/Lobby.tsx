@@ -17,7 +17,7 @@ interface GameSettingsData {
   timeLimit: number;
 }
 
-const Lobby: React.FC = () => {
+export default function Lobby() {
   const [players, setPlayers] = useState<Player[]>([
     { name: 'You', socketId: 'host-123', isHost: true },
     { name: 'Alice', socketId: 'player-456' },
@@ -64,10 +64,10 @@ const Lobby: React.FC = () => {
       <div className="lobby-content">
         <PlayerSidebar players={players} />
         <div className="lobby-main">
-          <div className="lobby-header">
+          {/* <div className="lobby-header">
             <h1>Bug Battles</h1>
             <p>Configure your game settings and invite players</p>
-          </div>
+          </div> */}
           
           <GameSettings 
             settings={gameSettings}
@@ -89,4 +89,4 @@ const Lobby: React.FC = () => {
   );
 };
 
-export default Lobby;
+// export default Lobby;
