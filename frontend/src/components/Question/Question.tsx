@@ -12,7 +12,6 @@ interface QuestionProps {
 const Question: React.FC<QuestionProps> = ({ question, code, selectedLines, setSelectedLines, onSubmit } : any) => {
   const codeLines = code.split('\n');
   
-
   const handleLineClick = (lineNumber: number) => {
     setSelectedLines((prev: any) => 
       prev.includes(lineNumber) 

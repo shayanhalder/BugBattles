@@ -57,13 +57,13 @@ function App() {
 
     socketRef.current.on(SOCKET_EVENTS.GAME_STARTED, (question: Question) => {
       console.log('Game started. Received question:', question)
-      setQuestions([...questions, question])
+      setQuestions(prevQuestions => [...prevQuestions, question])
       setGameStarted(true)
     })
 
     socketRef.current.on(SOCKET_EVENTS.QUESTION_ANSWERED, (roomCode: string, questionNumber: number, isCorrect: boolean, nextQuestion: Question) => {
       console.log('Next question:', nextQuestion)
-      setQuestions([...questions, nextQuestion])
+      setQuestions(prevQuestions => [...prevQuestions, nextQuestion])
     })
 
     return () => {
@@ -94,10 +94,12 @@ function App() {
       game: gameStarted
     };
 
-    if (viewMap.game) return <Game socketRef={socketRef} currentRoomCode={currentRoomCode} questions={questions} setQuestions={setQuestions} />;
+    if (viewMap.game) return <Game socketRef={socketRef} currentRoomCode={currentRoomCode} questions={questions} />;
     if (viewMap.lobby) return <Lobby socketRef={socketRef} currentRoomCode={currentRoomCode} />;
-    return <Home mode={mode} setMode={setMode} name={name} setName={setName} roomCode={roomCode} setRoomCode={setRoomCode} currentRoomCode={currentRoomCode} setCurrentRoomCode={setCurrentRoomCode} handleCreateRoom={handleCreateRoom} handleJoinRoom={handleJoinRoom}/>;
-  };
+    return <Home mode={mode} setMode={setMode} name={name} setName={setName} 
+        roomCode={roomCode} setRoomCode={setRoomCode} currentRoomCode={currentRoomCode} 
+        setCurrentRoomCode={setCurrentRoomCode} handleCreateRoom={handleCreateRoom} handleJoinRoom={handleJoinRoom}/>;
+  }
 
 
   return (

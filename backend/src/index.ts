@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
 import { GameState, Player, QuestionTypes, SOCKET_EVENTS } from './types';
+import questions from './questions';
 
 const PORT: number = parseInt(process.env.PORT || "4000");
 
@@ -20,18 +21,7 @@ function generateRoomCode(gameState: GameState): string {
     } while (roomCode in gameState);
     return roomCode;
 }
-const questions = [ 
-    {
-        question: "Where is the bug in this code? ",
-        code: "console.log('Paris')\n const a = 1;\n const b = 2;\n const c = a + b;",
-        answer: [1]
-    },
-    {
-        question: "Where is the bug in this code? ",
-        code: "console.log('Berlin')\n const a = 1;\n const b = 2;\n const c = a + b;",
-        answer: [2]
-    }
-]
+
 io.on("connection", (socket) => {
     console.log("A user connected", socket.id);
 
@@ -116,6 +106,7 @@ io.on("connection", (socket) => {
             return;
         }
         console.log("Answer received", answer);
+        console.log("Question number", questionNumber);
         const player = gameState[roomCode].players.find(player => player.socketId === socket.id);
         if (!player) {
             return;
@@ -131,7 +122,8 @@ io.on("connection", (socket) => {
             nextQuestion = null;
             gameState[roomCode].numPlayersFinished++;
         } else {
-            nextQuestion = gameState[roomCode].questions[questionNumber + 1];
+            // nextQuestion = gameState[roomCode].questions[questionNumber + 1];
+            nextQuestion = gameState[roomCode].questions[questionNumber];
             console.log("Next question", nextQuestion);
         }
         
