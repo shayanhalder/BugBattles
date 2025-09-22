@@ -5,12 +5,13 @@ import { SOCKET_EVENTS, type Question } from './types'
 import Lobby from './pages/Lobby/Lobby';
 import Home from './pages/Home/Home';
 import Game from './pages/Game/Game';
+import setupSocketEventListeners from './socketEventListeners';
 
 function App() {
   const [mode, setMode] = useState<'create' | 'join'>('create')
-  const [name, setName] = useState('')
-  const [roomCode, setRoomCode] = useState('')
-  const [currentRoomCode, setCurrentRoomCode] = useState('')
+  const [name, setName] = useState<string>('')
+  const [roomCode, setRoomCode] = useState<string>('')
+  const [currentRoomCode, setCurrentRoomCode] = useState<string>('')
   const [gameStarted, setGameStarted] = useState<boolean>(false)
   const [questions, setQuestions] = useState<Question[]>([])
   const socketRef = useRef<Socket | null>(null)
@@ -21,50 +22,7 @@ function App() {
       transports: ['websocket', 'polling']
     })
 
-    socketRef.current.on('connect', () => {
-      console.log('Connected to server:', socketRef.current?.id)
-    })
-
-    socketRef.current.on('disconnect', () => {
-      console.log('Disconnected from server')
-    })
-
-    socketRef.current.on('connect_error', (error) => {
-      console.error('Connection error:', error)
-      alert('Failed to connect to server. Please make sure the backend is running.')
-    })
-
-    socketRef.current.on(SOCKET_EVENTS.ROOM_CREATED, (roomCode: string) => {
-      console.log('Room created:', roomCode)
-      // socketRef.current?.join(roomCode)
-      setCurrentRoomCode(roomCode)
-    })
-
-    socketRef.current.on(SOCKET_EVENTS.ROOM_JOINED, (roomCode: string) => {
-      console.log('Joined room:', roomCode)
-      setCurrentRoomCode(roomCode)
-    })
-
-    socketRef.current.on(SOCKET_EVENTS.ROOM_NOT_FOUND, (roomCode: string) => {
-      console.error('Room not found:', roomCode)
-      alert('Room not found! Please check the room code.')
-    })
-
-    socketRef.current.on(SOCKET_EVENTS.NOT_AUTHORIZED, (roomCode: string) => {
-      console.error('Not authorized for room:', roomCode)
-      alert('You are not authorized to perform this action.')
-    })
-
-    socketRef.current.on(SOCKET_EVENTS.GAME_STARTED, (question: Question) => {
-      console.log('Game started. Received question:', question)
-      setQuestions(prevQuestions => [...prevQuestions, question])
-      setGameStarted(true)
-    })
-
-    socketRef.current.on(SOCKET_EVENTS.QUESTION_ANSWERED, (roomCode: string, questionNumber: number, isCorrect: boolean, nextQuestion: Question) => {
-      console.log('Next question:', nextQuestion)
-      setQuestions(prevQuestions => [...prevQuestions, nextQuestion])
-    })
+    setupSocketEventListeners(socketRef.current, setCurrentRoomCode, setQuestions, setGameStarted)
 
     return () => {
       if (socketRef.current) {
