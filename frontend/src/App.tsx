@@ -56,17 +56,31 @@ function App() {
       game: gameStarted
     };
 
-    if (viewMap.game) return <Game socketRef={socketRef} currentRoomCode={currentRoomCode} questions={questions} players={players} />;
-    if (viewMap.lobby) return <Lobby socketRef={socketRef} currentRoomCode={currentRoomCode} />;
-    return <Home mode={mode} setMode={setMode} name={name} setName={setName} 
-        roomCode={roomCode} setRoomCode={setRoomCode} currentRoomCode={currentRoomCode} 
-        setCurrentRoomCode={setCurrentRoomCode} handleCreateRoom={handleCreateRoom} handleJoinRoom={handleJoinRoom}/>;
+    if (viewMap.game) return (
+      <>
+      <Game socketRef={socketRef} currentRoomCode={currentRoomCode} questions={questions} players={players} />;
+      </>
+    )
+    if (viewMap.lobby) return (
+    <>
+    {/* <h1 className="title" style={{ textAlign: "left" }}>BugBattles</h1> */}
+    <Lobby socketRef={socketRef} currentRoomCode={currentRoomCode} />
+    </>
+    )
+    return (
+    <>
+      <h1 className="title">BugBattles</h1>
+      <Home mode={mode} setMode={setMode} name={name} setName={setName} 
+          roomCode={roomCode} setRoomCode={setRoomCode} currentRoomCode={currentRoomCode} 
+          setCurrentRoomCode={setCurrentRoomCode} handleCreateRoom={handleCreateRoom} handleJoinRoom={handleJoinRoom}/>
+    </>
+    )
   }
 
 
   return (
     <div className="app">
-      <h1 className="title">BugBattles</h1>
+      {/* <h1 className="title">BugBattles</h1> */}
       {renderCurrentView()}
       <AnswerAlert 
         isVisible={showAnswerAlert} 

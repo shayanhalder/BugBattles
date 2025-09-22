@@ -29,7 +29,7 @@ export default function Lobby( { socketRef, currentRoomCode } : any) {
     programmingLanguage: 'JavaScript',
     numberOfQuestions: 10,
     typesOfQuestions: ['selectCorrectCode', 'selectIncorrectCode'],
-    maxPlayers: 8,
+    maxPlayers: 7,
     timeLimit: 30,
   });
 

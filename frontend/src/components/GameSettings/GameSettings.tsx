@@ -127,7 +127,7 @@ const GameSettings: React.FC<GameSettingsProps> = ({ settings, onSettingsChange 
           </select>
         </div>
       </div>
-
+{/* 
       <div className="setting-item question-types">
         <label>
           <span className="setting-icon">🎯</span>
@@ -146,7 +146,7 @@ const GameSettings: React.FC<GameSettingsProps> = ({ settings, onSettingsChange 
             </label>
           ))}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

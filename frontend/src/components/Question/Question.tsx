@@ -40,7 +40,7 @@ const Question: React.FC<QuestionProps> = ({ question, code, selectedLines, setS
                   <span className="line-number">{lineNumber}</span>
                   <span className="line-content">{line}</span>
                 </div>
-              );
+              )
             })}
           </div>
         </div>
