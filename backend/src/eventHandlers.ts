@@ -108,7 +108,11 @@ function handleAnswerQuestion(socket: Socket, io: Server, gameState: GameState) 
             return;
         }
         // update answer in the game state
-        const isCorrect = answer === gameState[roomCode].questions[questionNumber].answer;
+        const correctAnswer = gameState[roomCode].questions[questionNumber - 1].answer.sort((a, b) => a - b);
+        // compare answer and correct answer arrays for equality
+        const isCorrect = Array.isArray(answer) && Array.isArray(correctAnswer) &&
+            answer.length === correctAnswer.length &&
+            answer.slice().sort((a, b) => a - b).every((val, idx) => val === correctAnswer[idx]);
         gameState[roomCode].players.find(player => player.socketId === socket.id)?.answers.push({
             playerAnswer: answer,
             isCorrect: isCorrect

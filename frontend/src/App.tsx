@@ -6,6 +6,7 @@ import Lobby from './pages/Lobby/Lobby';
 import Home from './pages/Home/Home';
 import Game from './pages/Game/Game';
 import setupSocketEventListeners from './socketEventListeners';
+import AnswerAlert from './components/AnswerAlert/AnswerAlert';
 
 function App() {
   const [mode, setMode] = useState<'create' | 'join'>('create')
@@ -15,6 +16,8 @@ function App() {
   const [gameStarted, setGameStarted] = useState<boolean>(false)
   const [questions, setQuestions] = useState<Question[]>([])
   const [players, setPlayers] = useState<{name: string, socketId: string, isHost?: boolean}[]>([])
+  const [showAnswerAlert, setShowAnswerAlert] = useState<boolean>(false)
+  const [answerIsCorrect, setAnswerIsCorrect] = useState<boolean>(false)
   const socketRef = useRef<Socket | null>(null)
 
   useEffect(() => {
@@ -23,7 +26,7 @@ function App() {
       transports: ['websocket', 'polling']
     })
 
-    setupSocketEventListeners(socketRef.current, setCurrentRoomCode, setQuestions, setGameStarted, setPlayers)
+    setupSocketEventListeners(socketRef.current, setCurrentRoomCode, setQuestions, setGameStarted, setPlayers, setShowAnswerAlert, setAnswerIsCorrect)
 
     return () => {
       if (socketRef.current) {
@@ -65,6 +68,11 @@ function App() {
     <div className="app">
       <h1 className="title">BugBattles</h1>
       {renderCurrentView()}
+      <AnswerAlert 
+        isVisible={showAnswerAlert} 
+        isCorrect={answerIsCorrect} 
+        onClose={() => setShowAnswerAlert(false)} 
+      />
     </div>
   )
 }
