@@ -16,6 +16,8 @@ export const SOCKET_EVENTS = {
     QUESTION_ANSWERED: "question_answered",
     INVALID_QUESTION_NUMBER: "invalid_question_number",
     PLAYER_FINISHED: "player_finished",
+    PLAYER_JOINED: "player_joined",
+    PLAYER_LEFT: "player_left",
 }
 
 

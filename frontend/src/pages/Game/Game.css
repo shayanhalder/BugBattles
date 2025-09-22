@@ -1,0 +1,22 @@
+.game-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+}
+
+.game-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .game-container {
+    flex-direction: column;
+  }
+  
+  .game-main {
+    height: calc(100vh - 200px);
+  }
+}

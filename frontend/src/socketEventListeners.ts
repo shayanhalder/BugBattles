@@ -1,7 +1,7 @@
 import { Socket } from "socket.io-client";
 import { SOCKET_EVENTS, type Question} from "./types";
 
-export default function setupSocketEventListeners(socket: Socket, setCurrentRoomCode: Function, setQuestions: Function, setGameStarted: Function) {
+export default function setupSocketEventListeners(socket: Socket, setCurrentRoomCode: Function, setQuestions: Function, setGameStarted: Function, setPlayers: Function) {
 
     socket.on('connect', () => {
         console.log('Connected to server:', socket.id)
@@ -16,10 +16,6 @@ export default function setupSocketEventListeners(socket: Socket, setCurrentRoom
         setCurrentRoomCode(roomCode)
     })
 
-    socket.on(SOCKET_EVENTS.ROOM_JOINED, (roomCode: string) => {
-        console.log('Joined room:', roomCode)
-        setCurrentRoomCode(roomCode)
-    })
 
     socket.on(SOCKET_EVENTS.ROOM_NOT_FOUND, (roomCode: string) => {
         console.error('Room not found:', roomCode)
@@ -37,9 +33,25 @@ export default function setupSocketEventListeners(socket: Socket, setCurrentRoom
         setGameStarted(true)
     })
 
-    socket.on(SOCKET_EVENTS.QUESTION_ANSWERED, (roomCode: string, questionNumber: number, isCorrect: boolean, nextQuestion: Question) => {
+    socket.on(SOCKET_EVENTS.QUESTION_ANSWERED, (_roomCode: string, _questionNumber: number, _isCorrect: boolean, nextQuestion: Question) => {
         console.log('Next question:', nextQuestion)
         setQuestions((prevQuestions: Question[]) => [...prevQuestions, nextQuestion])
+    })
+
+    socket.on(SOCKET_EVENTS.PLAYER_JOINED, (players: {name: string, socketId: string, isHost?: boolean}[]) => {
+        console.log('Player joined. Updated players list:', players)
+        setPlayers(players)
+    })
+
+    socket.on(SOCKET_EVENTS.PLAYER_LEFT, (players: {name: string, socketId: string, isHost?: boolean}[]) => {
+        console.log('Player left. Updated players list:', players)
+        setPlayers(players)
+    })
+
+    socket.on(SOCKET_EVENTS.ROOM_JOINED, (roomCode: string, players: {name: string, socketId: string, isHost?: boolean}[]) => {
+        console.log('Joined room:', roomCode, 'Players:', players)
+        setCurrentRoomCode(roomCode)
+        setPlayers(players)
     })
 }
 
