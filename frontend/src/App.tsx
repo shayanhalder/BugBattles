@@ -58,7 +58,7 @@ function App() {
 
     if (viewMap.game) return (
       <>
-      <Game socketRef={socketRef} currentRoomCode={currentRoomCode} questions={questions} players={players} />;
+      <Game socketRef={socketRef} currentRoomCode={currentRoomCode} questions={questions} players={players} />
       </>
     )
     if (viewMap.lobby) return (

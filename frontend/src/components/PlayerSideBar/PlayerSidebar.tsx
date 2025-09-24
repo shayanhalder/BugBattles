@@ -22,9 +22,6 @@ const PlayerSidebar: React.FC<PlayerSidebarProps> = ({ players }) => {
         {players.map((player, index) => (
           <div key={player.socketId} className="player-item">
             <div className="player-info">
-              {/* <div className="player-avatar">
-                {player.isHost ? '👑' : '👤'}
-              </div> */}
               <div className="player-rank">
                 #{index + 1}
               </div>
@@ -36,9 +33,6 @@ const PlayerSidebar: React.FC<PlayerSidebarProps> = ({ players }) => {
                 <span className="player-status">Ready</span>
               </div>
             </div>
-            {/* <div className="player-rank">
-              #{index + 1}
-            </div> */}
           </div>
         ))}
         
@@ -46,7 +40,6 @@ const PlayerSidebar: React.FC<PlayerSidebarProps> = ({ players }) => {
         {Array.from({ length: Math.max(0, 7 - players.length) }).map((_, index) => (
           <div key={`empty-${index}`} className="player-item empty-slot">
             <div className="player-info">
-              {/* <div className="player-avatar">👤</div> */}
               <div className="player-rank">
                 #{players.length + index + 1}
               </div>
@@ -55,9 +48,6 @@ const PlayerSidebar: React.FC<PlayerSidebarProps> = ({ players }) => {
                 <span className="player-status">Empty</span>
               </div>
             </div>
-            {/* <div className="player-rank">
-              #{players.length + index + 1}
-            </div> */}
           </div>
         ))}
       </div>
