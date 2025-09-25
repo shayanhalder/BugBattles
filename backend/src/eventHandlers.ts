@@ -148,7 +148,9 @@ function handlePlayerFinished(socket: Socket, io: Server, gameState: GameState) 
         for (let i = 0; i < ourPlayer?.answers.length; i++) {
             answerResults.push({
                 correctAnswer: gameState[roomCode].questions[i].answer,
-                playerAnswer: ourPlayer.answers[i].playerAnswer
+                playerAnswer: ourPlayer.answers[i].playerAnswer,
+                question: gameState[roomCode].questions[i].question,
+                code: gameState[roomCode].questions[i].code
             });
         }
 

@@ -68,6 +68,8 @@ interface GameState {
 interface AnswerResult {
     correctAnswer: number[]
     playerAnswer: number[]
+    question: string
+    code: string
 }
 
 export type { GameRoom, GameState, GameSettings, Question, Answer, Player, AnswerResult }

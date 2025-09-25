@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import './App.css'
 import { io, Socket } from "socket.io-client";
-import { SOCKET_EVENTS, type Question } from './types'
+import { SOCKET_EVENTS, type AnswerDeltaInfo, type Question } from './types'
 import Lobby from './pages/Lobby/Lobby';
 import Home from './pages/Home/Home';
 import Game from './pages/Game/Game';
@@ -18,6 +18,7 @@ function App() {
   const [players, setPlayers] = useState<{name: string, socketId: string, isHost?: boolean}[]>([])
   const [showAnswerAlert, setShowAnswerAlert] = useState<boolean>(false)
   const [answerIsCorrect, setAnswerIsCorrect] = useState<boolean>(false)
+  const [answerResults, setAnswerResults] = useState<AnswerDeltaInfo[]>([])
   const socketRef = useRef<Socket | null>(null)
   const nameRef = useRef<string | null>(null)
 
@@ -28,7 +29,7 @@ function App() {
     })
 
     setupSocketEventListeners(socketRef.current, setCurrentRoomCode, setQuestions, 
-      setGameStarted, setPlayers, setShowAnswerAlert, setAnswerIsCorrect)
+      setGameStarted, setPlayers, setShowAnswerAlert, setAnswerIsCorrect, setAnswerResults)
     
     return () => {
       if (socketRef.current) {
@@ -55,13 +56,14 @@ function App() {
     const viewMap = {
       home: !currentRoomCode && !gameStarted,
       lobby: currentRoomCode && !gameStarted,
-      game: gameStarted
+      game: gameStarted,
+      answerResults: answerResults
     };
 
     if (viewMap.game) return (
       <>
       <Game socketRef={socketRef} currentRoomCode={currentRoomCode} questions={questions} players={players}
-        name={name} />
+        name={name} answerResults={answerResults} />
       </>
     )
     if (viewMap.lobby) return (

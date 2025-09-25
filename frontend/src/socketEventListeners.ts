@@ -1,8 +1,9 @@
 import { Socket } from "socket.io-client";
-import { SOCKET_EVENTS, type AnswerResult, type Question} from "./types";
+import { SOCKET_EVENTS, type AnswerDeltaInfo, type Question} from "./types";
 
 export default function setupSocketEventListeners(socket: Socket, setCurrentRoomCode: Function, setQuestions: Function, 
-    setGameStarted: Function, setPlayers: Function, setShowAnswerAlert: Function, setAnswerIsCorrect: Function) {
+    setGameStarted: Function, setPlayers: Function, setShowAnswerAlert: Function, setAnswerIsCorrect: Function, 
+    setAnswerResults: Function) {
 
     socket.on('connect', () => {
         console.log('Connected to server:', socket.id)
@@ -64,8 +65,9 @@ export default function setupSocketEventListeners(socket: Socket, setCurrentRoom
         setPlayers(players)
     })
 
-    socket.on(SOCKET_EVENTS.PLAYER_FINISHED_RESULT, (answerResults: AnswerResult[]) => {
+    socket.on(SOCKET_EVENTS.PLAYER_FINISHED_RESULT, (answerResults: AnswerDeltaInfo[]) => {
         console.log('Player finished result:', answerResults)
+        setAnswerResults(answerResults);
     })
 }
 
