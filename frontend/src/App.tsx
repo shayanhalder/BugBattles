@@ -26,7 +26,8 @@ function App() {
       transports: ['websocket', 'polling']
     })
 
-    setupSocketEventListeners(socketRef.current, setCurrentRoomCode, setQuestions, setGameStarted, setPlayers, setShowAnswerAlert, setAnswerIsCorrect)
+    setupSocketEventListeners(socketRef.current, setCurrentRoomCode, setQuestions, 
+      setGameStarted, setPlayers, setShowAnswerAlert, setAnswerIsCorrect)
 
     return () => {
       if (socketRef.current) {
@@ -62,10 +63,9 @@ function App() {
       </>
     )
     if (viewMap.lobby) return (
-    <>
-    {/* <h1 className="title" style={{ textAlign: "left" }}>BugBattles</h1> */}
-    <Lobby socketRef={socketRef} currentRoomCode={currentRoomCode} />
-    </>
+      <>
+      <Lobby socketRef={socketRef} currentRoomCode={currentRoomCode} />
+      </>
     )
     return (
     <>
@@ -80,7 +80,6 @@ function App() {
 
   return (
     <div className="app">
-      {/* <h1 className="title">BugBattles</h1> */}
       {renderCurrentView()}
       <AnswerAlert 
         isVisible={showAnswerAlert} 

@@ -1,5 +1,5 @@
 import { Server, Socket } from "socket.io";
-import { GameState, Player, QuestionTypes, SOCKET_EVENTS } from "./types";
+import { GameState, Player, QuestionTypes, SOCKET_EVENTS, AnswerResult } from "./types";
 import questions from "./questions";
 
 export default function setupEventHandlers(socket: Socket, io: Server, gameState: GameState) {
@@ -8,6 +8,7 @@ export default function setupEventHandlers(socket: Socket, io: Server, gameState
     handleLeaveRoom(socket, gameState);
     handleStartGame(socket, gameState, io);
     handleAnswerQuestion(socket, io, gameState);
+    handlePlayerFinished(socket, io, gameState);
 }
 
 function handleCreateRoom(socket: Socket, gameState: GameState) {
@@ -130,6 +131,26 @@ function handleAnswerQuestion(socket: Socket, io: Server, gameState: GameState) 
         if (gameState[roomCode].numPlayersFinished === gameState[roomCode].players.length) {
             io.to(roomCode).emit(SOCKET_EVENTS.GAME_ENDED, roomCode);
         }
+    })
+}
+
+function handlePlayerFinished(socket: Socket, io: Server, gameState: GameState) {
+    socket.on(SOCKET_EVENTS.PLAYER_FINISHED, (roomCode: string, username: string) => {
+        const answerResults: AnswerResult[] = [];
+        const ourPlayer = gameState[roomCode].players.find(player => player.name === username);
+
+        if (!ourPlayer) {
+            return;
+        }
+        
+        for (let i = 0; i < ourPlayer?.answers.length; i++) {
+            answerResults.push({
+                correctAnswer: gameState[roomCode].questions[i].answer,
+                playerAnswer: ourPlayer.answers[i].playerAnswer
+            });
+        }
+
+        socket.emit(SOCKET_EVENTS.PLAYER_FINISHED_RESULT, answerResults);
     })
 }
 

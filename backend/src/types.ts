@@ -24,6 +24,7 @@ export enum SOCKET_EVENTS {
     QUESTION_ANSWERED = "question_answered",
     INVALID_QUESTION_NUMBER = "invalid_question_number",
     PLAYER_FINISHED = "player_finished",
+    PLAYER_FINISHED_RESULT = "player_finished_result",
 }
 
 interface Question {
@@ -64,7 +65,12 @@ interface GameState {
     [key: string]: GameRoom
 }
 
-export type { GameRoom, GameState, GameSettings, Question, Answer, Player }
+interface AnswerResult {
+    correctAnswer: number[]
+    playerAnswer: number[]
+}
+
+export type { GameRoom, GameState, GameSettings, Question, Answer, Player, AnswerResult }
 
 
 
