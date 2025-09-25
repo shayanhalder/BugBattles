@@ -1,7 +1,8 @@
 import { Socket } from "socket.io-client";
-import { SOCKET_EVENTS, type Question} from "./types";
+import { SOCKET_EVENTS, type AnswerResult, type Question} from "./types";
 
-export default function setupSocketEventListeners(socket: Socket, setCurrentRoomCode: Function, setQuestions: Function, setGameStarted: Function, setPlayers: Function, setShowAnswerAlert: Function, setAnswerIsCorrect: Function) {
+export default function setupSocketEventListeners(socket: Socket, setCurrentRoomCode: Function, setQuestions: Function, 
+    setGameStarted: Function, setPlayers: Function, setShowAnswerAlert: Function, setAnswerIsCorrect: Function) {
 
     socket.on('connect', () => {
         console.log('Connected to server:', socket.id)
@@ -33,9 +34,14 @@ export default function setupSocketEventListeners(socket: Socket, setCurrentRoom
         setGameStarted(true)
     })
 
-    socket.on(SOCKET_EVENTS.QUESTION_ANSWERED, (_roomCode: string, _questionNumber: number, isCorrect: boolean, nextQuestion: Question) => {
+    socket.on(SOCKET_EVENTS.QUESTION_ANSWERED, (_roomCode: string, username: string, _questionNumber: number, isCorrect: boolean, nextQuestion: Question) => {
         console.log('Next question:', nextQuestion)
         setQuestions((prevQuestions: Question[]) => [...prevQuestions, nextQuestion])
+        console.log('Name:', username)
+
+        if (!nextQuestion) {
+            socket.emit(SOCKET_EVENTS.PLAYER_FINISHED, _roomCode, username)
+        }
         
         // Show answer alert
         setAnswerIsCorrect(isCorrect)
@@ -56,6 +62,10 @@ export default function setupSocketEventListeners(socket: Socket, setCurrentRoom
         console.log('Joined room:', roomCode, 'Players:', players)
         setCurrentRoomCode(roomCode)
         setPlayers(players)
+    })
+
+    socket.on(SOCKET_EVENTS.PLAYER_FINISHED_RESULT, (answerResults: AnswerResult[]) => {
+        console.log('Player finished result:', answerResults)
     })
 }
 

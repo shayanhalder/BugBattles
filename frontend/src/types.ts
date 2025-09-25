@@ -16,6 +16,7 @@ export const SOCKET_EVENTS = {
     QUESTION_ANSWERED: "question_answered",
     INVALID_QUESTION_NUMBER: "invalid_question_number",
     PLAYER_FINISHED: "player_finished",
+    PLAYER_FINISHED_RESULT: "player_finished_result",
     PLAYER_JOINED: "player_joined",
     PLAYER_LEFT: "player_left",
 }
@@ -26,4 +27,9 @@ export interface Question {
     code: string
     playerAnswer: number[] | null
     isCorrect: boolean | null
+}
+
+export interface AnswerResult {
+    correctAnswer: number[]
+    playerAnswer: number[]
 }

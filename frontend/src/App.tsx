@@ -19,6 +19,7 @@ function App() {
   const [showAnswerAlert, setShowAnswerAlert] = useState<boolean>(false)
   const [answerIsCorrect, setAnswerIsCorrect] = useState<boolean>(false)
   const socketRef = useRef<Socket | null>(null)
+  const nameRef = useRef<string | null>(null)
 
   useEffect(() => {
     // initialize socket connection only once when component mounts
@@ -28,7 +29,7 @@ function App() {
 
     setupSocketEventListeners(socketRef.current, setCurrentRoomCode, setQuestions, 
       setGameStarted, setPlayers, setShowAnswerAlert, setAnswerIsCorrect)
-
+    
     return () => {
       if (socketRef.current) {
         socketRef.current.disconnect()
@@ -59,7 +60,8 @@ function App() {
 
     if (viewMap.game) return (
       <>
-      <Game socketRef={socketRef} currentRoomCode={currentRoomCode} questions={questions} players={players} />
+      <Game socketRef={socketRef} currentRoomCode={currentRoomCode} questions={questions} players={players}
+        name={name} />
       </>
     )
     if (viewMap.lobby) return (
@@ -72,7 +74,8 @@ function App() {
       <h1 className="title">BugBattles</h1>
       <Home mode={mode} setMode={setMode} name={name} setName={setName} 
           roomCode={roomCode} setRoomCode={setRoomCode} currentRoomCode={currentRoomCode} 
-          setCurrentRoomCode={setCurrentRoomCode} handleCreateRoom={handleCreateRoom} handleJoinRoom={handleJoinRoom}/>
+          setCurrentRoomCode={setCurrentRoomCode} handleCreateRoom={handleCreateRoom} handleJoinRoom={handleJoinRoom}
+          nameRef={nameRef}/>
     </>
     )
   }

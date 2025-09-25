@@ -4,12 +4,12 @@ import PlayerSidebar from '../../components/PlayerSideBar/PlayerSidebar'
 import { useState } from 'react'
 import { SOCKET_EVENTS } from '../../types';
 
-export default function Game({ socketRef, currentRoomCode, questions, players } : any ) {
+export default function Game({ socketRef, currentRoomCode, questions, players, name } : any ) {
     const [selectedLines, setSelectedLines] = useState<number[]>([]);
     const currentQuestion = questions[questions.length - 1]
 
     function submitAnswer() {
-        socketRef.current.emit(SOCKET_EVENTS.ANSWER_QUESTION, currentRoomCode, questions.length, selectedLines)
+        socketRef.current.emit(SOCKET_EVENTS.ANSWER_QUESTION, currentRoomCode, name, questions.length, selectedLines)
         setSelectedLines([])
     }
     
@@ -17,8 +17,12 @@ export default function Game({ socketRef, currentRoomCode, questions, players } 
         <div className="game-container">
             <PlayerSidebar players={players} />
             <div className="game-main">
-                <Question question={currentQuestion.question} code={currentQuestion.code} onSubmit={submitAnswer}
-                    selectedLines={selectedLines} setSelectedLines={setSelectedLines} />
+                {
+                    currentQuestion && (
+                        <Question question={currentQuestion.question} code={currentQuestion.code} onSubmit={submitAnswer}
+                            selectedLines={selectedLines} setSelectedLines={setSelectedLines} />
+                    )
+                }
             </div>
         </div>
     )

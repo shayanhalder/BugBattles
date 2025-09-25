@@ -1,6 +1,6 @@
 import './Home.css'
 
-export default function Home({ mode, setMode, name, setName, roomCode, setRoomCode, currentRoomCode, setCurrentRoomCode, handleCreateRoom, handleJoinRoom } : any ) {
+export default function Home({ mode, setMode, name, setName, roomCode, setRoomCode, currentRoomCode, setCurrentRoomCode, handleCreateRoom, handleJoinRoom, nameRef } : any ) {
   return (
     <div className="main-panel">
         <div className="mode-toggle">
@@ -23,6 +23,7 @@ export default function Home({ mode, setMode, name, setName, roomCode, setRoomCo
             type="text"
             placeholder="Enter your name"
             value={name}
+            ref={nameRef}
             onChange={(e) => setName(e.target.value)}
             className="input-field"
         />

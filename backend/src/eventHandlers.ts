@@ -93,17 +93,18 @@ function handleStartGame(socket: Socket, gameState: GameState, io: Server) {
 }
 
 function handleAnswerQuestion(socket: Socket, io: Server, gameState: GameState) {
-    socket.on(SOCKET_EVENTS.ANSWER_QUESTION, (roomCode: string, questionNumber: number, answer: number[]) => {
+    socket.on(SOCKET_EVENTS.ANSWER_QUESTION, (roomCode: string, username: string, questionNumber: number, answer: number[]) => {
         if (!(roomCode in gameState)) {
             socket.emit(SOCKET_EVENTS.ROOM_NOT_FOUND, roomCode);
             return;
         }
-        if (questionNumber >= gameState[roomCode].questions.length || questionNumber < 0) {
+        if (questionNumber > gameState[roomCode].questions.length || questionNumber < 0) {
             socket.emit(SOCKET_EVENTS.INVALID_QUESTION_NUMBER, roomCode);
             return;
         }
         console.log("Answer received", answer);
         console.log("Question number", questionNumber);
+        console.log("num questions", gameState[roomCode].questions.length);
         const player = gameState[roomCode].players.find(player => player.socketId === socket.id);
         if (!player) {
             return;
@@ -119,7 +120,8 @@ function handleAnswerQuestion(socket: Socket, io: Server, gameState: GameState) 
             isCorrect: isCorrect
         });
         let nextQuestion;
-        if (questionNumber === gameState[roomCode].questions.length - 1) {
+        if (questionNumber === gameState[roomCode].questions.length) {
+            console.log("Player finished");
             nextQuestion = null;
             gameState[roomCode].numPlayersFinished++;
         } else {
@@ -127,7 +129,7 @@ function handleAnswerQuestion(socket: Socket, io: Server, gameState: GameState) 
             console.log("Next question", nextQuestion);
         }
         
-        socket.emit(SOCKET_EVENTS.QUESTION_ANSWERED, roomCode, questionNumber, isCorrect, nextQuestion);
+        socket.emit(SOCKET_EVENTS.QUESTION_ANSWERED, roomCode, username, questionNumber, isCorrect, nextQuestion);
         if (gameState[roomCode].numPlayersFinished === gameState[roomCode].players.length) {
             io.to(roomCode).emit(SOCKET_EVENTS.GAME_ENDED, roomCode);
         }
