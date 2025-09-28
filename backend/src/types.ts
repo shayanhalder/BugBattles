@@ -27,6 +27,11 @@ export enum SOCKET_EVENTS {
     PLAYER_FINISHED_RESULT = "player_finished_result",
 }
 
+export enum GAME_STYLE {
+    KAHOOT = "kahoot", // every player answers the same question one by one similar to kahoot
+    STANDARD = "standard", // every player progresses to the next question at their own pace
+}
+
 interface Question {
     question: string
     code: string
@@ -42,7 +47,7 @@ interface Player {
     name: string
     socketId: string
     answers: Answer[]
-    timeTaken: number | null // in seconds
+    totalQuestionTimeTaken: number // in seconds
 }
 
 interface GameSettings {
@@ -50,6 +55,7 @@ interface GameSettings {
     questionTypes: Array<QuestionTypes>
     maxPlayers: number
     timeLimit: number // in seconds
+    gameStyle: GAME_STYLE
 }
 
 interface GameRoom {
@@ -58,6 +64,7 @@ interface GameRoom {
     host: Player
     isGameStarted: boolean
     numPlayersFinished: number
+    startTime: number | null, 
     settings: GameSettings
 }
 

@@ -35,11 +35,12 @@ export default function setupSocketEventListeners(socket: Socket, setCurrentRoom
         setGameStarted(true)
     })
 
-    socket.on(SOCKET_EVENTS.QUESTION_ANSWERED, (_roomCode: string, username: string, _questionNumber: number, isCorrect: boolean, nextQuestion: Question) => {
+    socket.on(SOCKET_EVENTS.QUESTION_ANSWERED, (_roomCode: string, username: string, _questionNumber: number, isCorrect: boolean, nextQuestion: Question, currentPlayerRankings: any) => {
         console.log('Next question:', nextQuestion)
         setQuestions((prevQuestions: Question[]) => [...prevQuestions, nextQuestion])
         console.log('Name:', username)
-
+        console.log('Current player rankings:', currentPlayerRankings)
+        
         if (!nextQuestion) {
             socket.emit(SOCKET_EVENTS.PLAYER_FINISHED, _roomCode, username)
         }

@@ -29,7 +29,7 @@ export interface Question {
     isCorrect: boolean | null
 }
 
-export interface AnswerDelta {
+export interface AnswerDeltaInfo {
     question: string,
     code: string,
     correctAnswer: number[]

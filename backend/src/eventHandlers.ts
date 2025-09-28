@@ -1,6 +1,7 @@
 import { Server, Socket } from "socket.io";
-import { GameState, Player, QuestionTypes, SOCKET_EVENTS, AnswerResult } from "./types";
+import { GameState, Player, QuestionTypes, SOCKET_EVENTS, AnswerResult, GAME_STYLE } from "./types";
 import questions from "./questions";
+import { calculateCurrentPlayerRanking } from "./helpers";
 
 export default function setupEventHandlers(socket: Socket, io: Server, gameState: GameState) {
     handleCreateRoom(socket, gameState);
@@ -18,7 +19,7 @@ function handleCreateRoom(socket: Socket, gameState: GameState) {
             name: username || "Host",
             socketId: socket.id,
             answers: [],
-            timeTaken: null
+            totalQuestionTimeTaken: 0
         }
         gameState[roomCode] = {
             questions: questions,
@@ -26,11 +27,13 @@ function handleCreateRoom(socket: Socket, gameState: GameState) {
             host: host,
             isGameStarted: false,
             numPlayersFinished: 0,
+            startTime: null,
             settings: {
                 numberOfQuestions: 10,
                 questionTypes: [QuestionTypes.alwaysIncorrect, QuestionTypes.unknownCorrectness, QuestionTypes.selectIncorrectCode, QuestionTypes.selectCorrectCode],
                 maxPlayers: 4,
-                timeLimit: 900
+                timeLimit: 900,
+                gameStyle: GAME_STYLE.STANDARD
             }
         }
         console.log("Room created", gameState);
@@ -51,7 +54,7 @@ function handleJoinRoom(socket: Socket, gameState: GameState) {
             name: username,
             socketId: socket.id,
             answers: [],
-            timeTaken: null
+            totalQuestionTimeTaken: 0
         }
         gameState[roomCode].players.push(player);
         socket.emit(SOCKET_EVENTS.ROOM_JOINED, roomCode);
@@ -85,6 +88,7 @@ function handleStartGame(socket: Socket, gameState: GameState, io: Server) {
         gameState[roomCode].isGameStarted = true;
         console.log("Game started", gameState[roomCode]);
         // game started, send the first question to all players
+        gameState[roomCode].startTime = Date.now();
         io.to(roomCode).emit(SOCKET_EVENTS.GAME_STARTED, gameState[roomCode].questions[0]);
         setTimeout(() => {
             io.to(roomCode).emit(SOCKET_EVENTS.GAME_ENDED, roomCode);
@@ -94,11 +98,12 @@ function handleStartGame(socket: Socket, gameState: GameState, io: Server) {
 
 function handleAnswerQuestion(socket: Socket, io: Server, gameState: GameState) {
     socket.on(SOCKET_EVENTS.ANSWER_QUESTION, (roomCode: string, username: string, questionNumber: number, answer: number[]) => {
-        if (!(roomCode in gameState)) {
+        // questionNumber = question being answered (1-indexed)
+        if (!(roomCode in gameState)) { // invalid room code
             socket.emit(SOCKET_EVENTS.ROOM_NOT_FOUND, roomCode);
             return;
         }
-        if (questionNumber > gameState[roomCode].questions.length || questionNumber < 0) {
+        if (questionNumber > gameState[roomCode].questions.length || questionNumber < 0) { // invalid question number
             socket.emit(SOCKET_EVENTS.INVALID_QUESTION_NUMBER, roomCode);
             return;
         }
@@ -106,7 +111,7 @@ function handleAnswerQuestion(socket: Socket, io: Server, gameState: GameState) 
         console.log("Question number", questionNumber);
         console.log("num questions", gameState[roomCode].questions.length);
         const player = gameState[roomCode].players.find(player => player.socketId === socket.id);
-        if (!player) {
+        if (!player) { // player not found
             return;
         }
         // update answer in the game state
@@ -128,8 +133,8 @@ function handleAnswerQuestion(socket: Socket, io: Server, gameState: GameState) 
             nextQuestion = gameState[roomCode].questions[questionNumber];
             console.log("Next question", nextQuestion);
         }
-        
-        socket.emit(SOCKET_EVENTS.QUESTION_ANSWERED, roomCode, username, questionNumber, isCorrect, nextQuestion);
+        const currentPlayerRankings = calculateCurrentPlayerRanking(gameState[roomCode]);
+        socket.emit(SOCKET_EVENTS.QUESTION_ANSWERED, roomCode, username, questionNumber, isCorrect, nextQuestion, currentPlayerRankings);
         if (gameState[roomCode].numPlayersFinished === gameState[roomCode].players.length) {
             io.to(roomCode).emit(SOCKET_EVENTS.GAME_ENDED, roomCode);
         }
