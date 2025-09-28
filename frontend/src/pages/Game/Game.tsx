@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { SOCKET_EVENTS } from '../../types';
 import AnswerResults from '../../components/AnswerResults/AnswerResults';
 
-export default function Game({ socketRef, currentRoomCode, questions, players, name, answerResults } : any ) {
+export default function Game({ socketRef, currentRoomCode, questions, players, name, answerResults, isGameStarted } : any ) {
     const [selectedLines, setSelectedLines] = useState<number[]>([]);
     const currentQuestion = questions[questions.length - 1]
 
@@ -22,7 +22,7 @@ export default function Game({ socketRef, currentRoomCode, questions, players, n
     
     return (
         <div className="game-container">
-            <PlayerSidebar players={players} />
+            <PlayerSidebar players={players} isGameStarted={isGameStarted} />
             <div className="game-main">
                 {
                     currentQuestion && (

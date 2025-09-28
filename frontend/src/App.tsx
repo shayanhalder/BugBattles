@@ -68,13 +68,13 @@ function App() {
 
     if (viewMap.game) return (
       <>
-      <Game socketRef={socketRef} currentRoomCode={currentRoomCode} questions={questions} players={players}
-        name={name} answerResults={answerResults} />
+        <Game socketRef={socketRef} currentRoomCode={currentRoomCode} questions={questions} players={players}
+          name={name} answerResults={answerResults} isGameStarted={gameStarted} />
       </>
     )
     if (viewMap.lobby) return (
       <>
-      <Lobby players={players} socketRef={socketRef} currentRoomCode={currentRoomCode} />
+        <Lobby players={players} socketRef={socketRef} currentRoomCode={currentRoomCode} isGameStarted={gameStarted} />
       </>
     )
     return (

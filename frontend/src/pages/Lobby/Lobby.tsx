@@ -20,7 +20,7 @@ interface GameSettingsData {
   timeLimit: number;
 }
 
-export default function Lobby( { players, socketRef, currentRoomCode } : any) {
+export default function Lobby( { players, socketRef, currentRoomCode, isGameStarted } : any) {
 
   const [gameSettings, setGameSettings] = useState<GameSettingsData>({
     programmingLanguage: 'JavaScript',
@@ -60,7 +60,7 @@ export default function Lobby( { players, socketRef, currentRoomCode } : any) {
   return (
     <div className="lobby-container">
       <div className="lobby-content">
-        <PlayerSidebar players={players} />
+        <PlayerSidebar players={players} isGameStarted={isGameStarted} />
         <div className="lobby-main">
           {/* <div className="lobby-header">
             <h1>Bug Battles</h1>

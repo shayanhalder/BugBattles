@@ -50,6 +50,7 @@ interface Player {
     answers: Answer[]
     accuracy: number // number of questions correctly answered
     totalQuestionTimeTaken: number // in seconds
+    isHost: boolean
 }
 
 interface GameSettings {

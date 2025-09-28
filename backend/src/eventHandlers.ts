@@ -21,7 +21,8 @@ function handleCreateRoom(socket: Socket, io: Server, gameState: GameState) {
             socketId: socket.id,
             answers: [],
             totalQuestionTimeTaken: 0,
-            accuracy: 0
+            accuracy: 0,
+            isHost: true
         }
         gameState[roomCode] = {
             questions: questions,
@@ -64,7 +65,8 @@ function handleJoinRoom(socket: Socket, io: Server, gameState: GameState) {
             socketId: socket.id,
             answers: [],
             accuracy: 0,
-            totalQuestionTimeTaken: 0
+            totalQuestionTimeTaken: 0,
+            isHost: false
         }
         gameState[roomCode].players.push(player);
         const currentPlayerRankings = calculateCurrentPlayerRanking(gameState[roomCode]);

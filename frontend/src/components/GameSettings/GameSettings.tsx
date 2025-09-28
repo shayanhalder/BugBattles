@@ -28,12 +28,12 @@ const GameSettings: React.FC<GameSettingsProps> = ({ settings, onSettingsChange 
     'Ruby'
   ];
 
-  const questionTypes = [
-    { value: 'selectCorrectCode', label: 'Select Correct Code' },
-    { value: 'selectIncorrectCode', label: 'Select Incorrect Code' },
-    { value: 'alwaysIncorrect', label: 'Always Incorrect' },
-    { value: 'unknownCorrectness', label: 'Unknown Correctness' }
-  ];
+  // const questionTypes = [
+  //   { value: 'selectCorrectCode', label: 'Select Correct Code' },
+  //   { value: 'selectIncorrectCode', label: 'Select Incorrect Code' },
+  //   { value: 'alwaysIncorrect', label: 'Always Incorrect' },
+  //   { value: 'unknownCorrectness', label: 'Unknown Correctness' }
+  // ];
 
   const numberOfQuestionsOptions = [5, 10, 15, 20, 25, 30];
   const maxPlayersOptions = [2, 4, 6, 8, 10, 12];
@@ -46,13 +46,13 @@ const GameSettings: React.FC<GameSettingsProps> = ({ settings, onSettingsChange 
     });
   };
 
-  const handleQuestionTypeChange = (type: string, checked: boolean) => {
-    if (checked) {
-      handleSettingChange('typesOfQuestions', [...settings.typesOfQuestions, type]);
-    } else {
-      handleSettingChange('typesOfQuestions', settings.typesOfQuestions.filter(t => t !== type));
-    }
-  };
+  // const handleQuestionTypeChange = (type: string, checked: boolean) => {
+  //   if (checked) {
+  //     handleSettingChange('typesOfQuestions', [...settings.typesOfQuestions, type]);
+  //   } else {
+  //     handleSettingChange('typesOfQuestions', settings.typesOfQuestions.filter(t => t !== type));
+  //   }
+  // };
 
   return (
     <div className="game-settings">
