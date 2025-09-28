@@ -5,10 +5,12 @@ import './Lobby.css';
 import { SOCKET_EVENTS } from '../../types.ts';
 
 interface Player {
-  name: string;
+  username: string;
   socketId: string;
-  isHost?: boolean;
+  accuracy: number;
+  currentQuestion: number;
 }
+
 
 interface GameSettingsData {
   programmingLanguage: string;
@@ -18,12 +20,7 @@ interface GameSettingsData {
   timeLimit: number;
 }
 
-export default function Lobby( { socketRef, currentRoomCode } : any) {
-  const [players, setPlayers] = useState<Player[]>([
-    { name: 'You', socketId: 'host-123', isHost: true },
-    { name: 'Alice', socketId: 'player-456' },
-    { name: 'Bob', socketId: 'player-789' },
-  ]);
+export default function Lobby( { players, socketRef, currentRoomCode } : any) {
 
   const [gameSettings, setGameSettings] = useState<GameSettingsData>({
     programmingLanguage: 'JavaScript',
@@ -35,11 +32,14 @@ export default function Lobby( { socketRef, currentRoomCode } : any) {
 
   const handleStartGame = () => {
     console.log('Starting game with settings:', gameSettings);
-    socketRef.current?.emit(SOCKET_EVENTS.START_GAME, currentRoomCode);
+    const payload = {
+      roomCode: currentRoomCode
+    }
+    socketRef.current?.emit(SOCKET_EVENTS.START_GAME, payload);
   };
 
   const handleInvite = async () => {
-    const inviteLink = `${window.location.origin}/join/${generateRoomId()}`;
+    const inviteLink = `${window.location.origin}/join/${currentRoomCode}`;
     try {
       await navigator.clipboard.writeText(inviteLink);
       alert('Invite link copied to clipboard!');
@@ -56,9 +56,6 @@ export default function Lobby( { socketRef, currentRoomCode } : any) {
     }
   };
 
-  const generateRoomId = () => {
-    return Math.random().toString(36).substring(2, 8).toUpperCase();
-  };
 
   return (
     <div className="lobby-container">

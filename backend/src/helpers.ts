@@ -1,42 +1,28 @@
-import { GameRoom, Answer } from "./types";
+import { GameRoom, Answer, Player } from "./types";
 
-interface PlayerInfo {
-    playerName: string;
-    socketId: string;
-    accuracy: number;
-    currentQuestion: number;
-}
-
-export function calculateCurrentPlayerRanking(gameRoom: GameRoom) : PlayerInfo[] {
+export function calculateCurrentPlayerRanking(gameRoom: GameRoom) : Player[] {
     // players ranked based on their accuracy. if two players have the same accuracy, the player who has completed more questions is ranked higher
     // otherwise the players are tied.
-    const playerInfo : PlayerInfo[] = []
-
-    for (const player of gameRoom.players) {
+    
+    for (let i = 0; i < gameRoom.players.length; i++) {
         let numCorrect = 0;
-        player.answers.forEach((answer: Answer) => {
+        gameRoom.players[i].answers.forEach((answer: Answer) => {
             if (answer.isCorrect) {
                 numCorrect++;   
             }
         })
-        let accuracy = numCorrect / player.answers.length;
-        let currentQuestion = player.answers.length + 1;
-        playerInfo.push({
-            playerName: player.name,
-            socketId: player.socketId,
-            accuracy: accuracy,
-            currentQuestion: currentQuestion
-        })
+        let accuracy = gameRoom.players[i].answers.length > 0 ? numCorrect / gameRoom.players[i].answers.length : 0;
+        gameRoom.players[i].accuracy = accuracy;
     }
-    playerInfo.sort((a, b) => {
+    gameRoom.players.sort((a: Player, b: Player) => {
         if (b.accuracy !== a.accuracy) {
-            return b.accuracy - a.accuracy;
+            return b.accuracy - a.accuracy; // higher accuracy is better
         } else {
-            return b.currentQuestion - a.currentQuestion;
+            return b.answers.length - a.answers.length; // more questions answered is better
         }
     })
 
-    return playerInfo;
+    return gameRoom.players;
 }
 
 

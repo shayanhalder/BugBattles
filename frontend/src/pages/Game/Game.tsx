@@ -10,7 +10,13 @@ export default function Game({ socketRef, currentRoomCode, questions, players, n
     const currentQuestion = questions[questions.length - 1]
 
     function submitAnswer() {
-        socketRef.current.emit(SOCKET_EVENTS.ANSWER_QUESTION, currentRoomCode, name, questions.length, selectedLines)
+        const payload = {
+            roomCode: currentRoomCode,
+            username: name,
+            questionNumber: questions.length,
+            answer: selectedLines
+        }
+        socketRef.current.emit(SOCKET_EVENTS.ANSWER_QUESTION, payload)
         setSelectedLines([])
     }
     

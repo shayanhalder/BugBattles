@@ -2,7 +2,7 @@ import React from 'react';
 import './PlayerSidebar.css';
 
 interface Player {
-  name: string;
+  username: string;
   socketId: string;
   isHost?: boolean;
 }
@@ -27,25 +27,10 @@ const PlayerSidebar: React.FC<PlayerSidebarProps> = ({ players }) => {
               </div>
               <div className="player-details">
                 <span className="player-name">
-                  {player.name}
+                  {player.username}
                   {player.isHost && <span className="host-badge">Host</span>}
                 </span>
                 <span className="player-status">Ready</span>
-              </div>
-            </div>
-          </div>
-        ))}
-        
-        {/* Show empty slots for remaining players */}
-        {Array.from({ length: Math.max(0, 7 - players.length) }).map((_, index) => (
-          <div key={`empty-${index}`} className="player-item empty-slot">
-            <div className="player-info">
-              <div className="player-rank">
-                #{players.length + index + 1}
-              </div>
-              <div className="player-details">
-                <span className="player-name">Waiting...</span>
-                <span className="player-status">Empty</span>
               </div>
             </div>
           </div>

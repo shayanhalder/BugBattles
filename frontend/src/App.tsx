@@ -20,7 +20,6 @@ function App() {
   const [answerIsCorrect, setAnswerIsCorrect] = useState<boolean>(false)
   const [answerResults, setAnswerResults] = useState<AnswerDeltaInfo[]>([])
   const socketRef = useRef<Socket | null>(null)
-  const nameRef = useRef<string | null>(null)
 
   useEffect(() => {
     // initialize socket connection only once when component mounts
@@ -29,7 +28,7 @@ function App() {
     })
 
     setupSocketEventListeners(socketRef.current, setCurrentRoomCode, setQuestions, 
-      setGameStarted, setPlayers, setShowAnswerAlert, setAnswerIsCorrect, setAnswerResults)
+      setGameStarted, setPlayers, setShowAnswerAlert, setAnswerIsCorrect, setAnswerResults, setName)
     
     return () => {
       if (socketRef.current) {
@@ -41,14 +40,21 @@ function App() {
   const handleCreateRoom = () => {
     if (socketRef.current && name.trim()) {
       console.log('Creating room with name:', name)
-      socketRef.current.emit(SOCKET_EVENTS.CREATE_ROOM, name)
+      const payload = {
+        username: name
+      }
+      socketRef.current.emit(SOCKET_EVENTS.CREATE_ROOM, payload)
     }
   }
 
   const handleJoinRoom = () => {
     if (socketRef.current && name.trim() && roomCode.trim()) {
       console.log('Joining room:', roomCode, 'with name:', name)
-      socketRef.current.emit(SOCKET_EVENTS.JOIN_ROOM, roomCode, name)
+      const payload = {
+        roomCode: roomCode,
+        username: name
+      }
+      socketRef.current.emit(SOCKET_EVENTS.JOIN_ROOM, payload)
     }
   }
 
@@ -68,7 +74,7 @@ function App() {
     )
     if (viewMap.lobby) return (
       <>
-      <Lobby socketRef={socketRef} currentRoomCode={currentRoomCode} />
+      <Lobby players={players} socketRef={socketRef} currentRoomCode={currentRoomCode} />
       </>
     )
     return (
@@ -77,7 +83,7 @@ function App() {
       <Home mode={mode} setMode={setMode} name={name} setName={setName} 
           roomCode={roomCode} setRoomCode={setRoomCode} currentRoomCode={currentRoomCode} 
           setCurrentRoomCode={setCurrentRoomCode} handleCreateRoom={handleCreateRoom} handleJoinRoom={handleJoinRoom}
-          nameRef={nameRef}/>
+          />
     </>
     )
   }

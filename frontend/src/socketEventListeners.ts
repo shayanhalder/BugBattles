@@ -3,7 +3,7 @@ import { SOCKET_EVENTS, type AnswerDeltaInfo, type Question} from "./types";
 
 export default function setupSocketEventListeners(socket: Socket, setCurrentRoomCode: Function, setQuestions: Function, 
     setGameStarted: Function, setPlayers: Function, setShowAnswerAlert: Function, setAnswerIsCorrect: Function, 
-    setAnswerResults: Function) {
+    setAnswerResults: Function, setName: Function) {
 
     socket.on('connect', () => {
         console.log('Connected to server:', socket.id)
@@ -35,24 +35,34 @@ export default function setupSocketEventListeners(socket: Socket, setCurrentRoom
         setGameStarted(true)
     })
 
-    socket.on(SOCKET_EVENTS.QUESTION_ANSWERED, (_roomCode: string, username: string, _questionNumber: number, isCorrect: boolean, nextQuestion: Question, currentPlayerRankings: any) => {
-        console.log('Next question:', nextQuestion)
-        setQuestions((prevQuestions: Question[]) => [...prevQuestions, nextQuestion])
-        console.log('Name:', username)
-        console.log('Current player rankings:', currentPlayerRankings)
-        
-        if (!nextQuestion) {
-            socket.emit(SOCKET_EVENTS.PLAYER_FINISHED, _roomCode, username)
+    socket.on(SOCKET_EVENTS.QUESTION_ANSWERED, (response: any) => {
+        console.log("response:", response)
+        console.log('Next question:', response.nextQuestion)
+        setQuestions((prevQuestions: Question[]) => [...prevQuestions, response.nextQuestion])
+        console.log('Name:', response.username)
+
+        if (!response.nextQuestion) {
+            const payload = {
+                roomCode: response.roomCode,
+                username: response.username
+            }
+            socket.emit(SOCKET_EVENTS.PLAYER_FINISHED, payload)
         }
         
         // Show answer alert
-        setAnswerIsCorrect(isCorrect)
+        setAnswerIsCorrect(response.isCorrect)
         setShowAnswerAlert(true)
     })
 
-    socket.on(SOCKET_EVENTS.PLAYER_JOINED, (players: {name: string, socketId: string, isHost?: boolean}[]) => {
-        console.log('Player joined. Updated players list:', players)
-        setPlayers(players)
+    socket.on(SOCKET_EVENTS.PLAYER_RANKING_UPDATED, (response: any) => {
+        console.log('Current player rankings:', response.currentPlayerRankings)
+        setPlayers(response.currentPlayerRankings)
+    })
+
+    socket.on(SOCKET_EVENTS.PLAYER_JOINED, (response: {username: string, socketId: string, isHost?: boolean, players: any[]}) => {
+        // console.log('Player joined. Updated players list:', players)
+        console.log("player joined response: ", response)
+        setPlayers(response.players)
     })
 
     socket.on(SOCKET_EVENTS.PLAYER_LEFT, (players: {name: string, socketId: string, isHost?: boolean}[]) => {
@@ -60,8 +70,10 @@ export default function setupSocketEventListeners(socket: Socket, setCurrentRoom
         setPlayers(players)
     })
 
-    socket.on(SOCKET_EVENTS.ROOM_JOINED, (roomCode: string, players: {name: string, socketId: string, isHost?: boolean}[]) => {
+    socket.on(SOCKET_EVENTS.ROOM_JOINED, (response: {roomCode: string, username: string, players: {username: string, socketId: string, isHost?: boolean}[]}) => {
+        const { roomCode, players, username } = response;
         console.log('Joined room:', roomCode, 'Players:', players)
+        setName(username)
         setCurrentRoomCode(roomCode)
         setPlayers(players)
     })

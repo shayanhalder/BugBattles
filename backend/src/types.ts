@@ -22,6 +22,7 @@ export enum SOCKET_EVENTS {
     NOT_AUTHORIZED = "not_authorized",
     ANSWER_QUESTION = "answer_question",
     QUESTION_ANSWERED = "question_answered",
+    PLAYER_RANKING_UPDATED = "player_ranking_updated",
     INVALID_QUESTION_NUMBER = "invalid_question_number",
     PLAYER_FINISHED = "player_finished",
     PLAYER_FINISHED_RESULT = "player_finished_result",
@@ -44,9 +45,10 @@ interface Answer {
 }
 
 interface Player {
-    name: string
+    username: string
     socketId: string
     answers: Answer[]
+    accuracy: number // number of questions correctly answered
     totalQuestionTimeTaken: number // in seconds
 }
 

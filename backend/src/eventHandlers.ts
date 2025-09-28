@@ -4,22 +4,24 @@ import questions from "./questions";
 import { calculateCurrentPlayerRanking } from "./helpers";
 
 export default function setupEventHandlers(socket: Socket, io: Server, gameState: GameState) {
-    handleCreateRoom(socket, gameState);
-    handleJoinRoom(socket, gameState);
+    handleCreateRoom(socket, io, gameState);
+    handleJoinRoom(socket, io, gameState);
     handleLeaveRoom(socket, gameState);
     handleStartGame(socket, gameState, io);
     handleAnswerQuestion(socket, io, gameState);
     handlePlayerFinished(socket, io, gameState);
 }
 
-function handleCreateRoom(socket: Socket, gameState: GameState) {
-    socket.on(SOCKET_EVENTS.CREATE_ROOM, (username: string | null) => {
+function handleCreateRoom(socket: Socket, io: Server, gameState: GameState) {
+    socket.on(SOCKET_EVENTS.CREATE_ROOM, (payload: { username: string | null }) => {
+        const { username } = payload;
         const roomCode = generateRoomCode(gameState);
         const host: Player = {
-            name: username || "Host",
+            username: username || "Host",
             socketId: socket.id,
             answers: [],
-            totalQuestionTimeTaken: 0
+            totalQuestionTimeTaken: 0,
+            accuracy: 0
         }
         gameState[roomCode] = {
             questions: questions,
@@ -38,31 +40,51 @@ function handleCreateRoom(socket: Socket, gameState: GameState) {
         }
         console.log("Room created", gameState);
         socket.join(roomCode);
+        const currentPlayerRankings = calculateCurrentPlayerRanking(gameState[roomCode]);
+        const currentPlayerRankingsResponse = {
+            roomCode: roomCode,
+            currentPlayerRankings: currentPlayerRankings
+        }
+        io.to(roomCode).emit(SOCKET_EVENTS.PLAYER_RANKING_UPDATED, currentPlayerRankingsResponse);
         socket.emit(SOCKET_EVENTS.ROOM_CREATED, roomCode);
     })
 
 }
 
-function handleJoinRoom(socket: Socket, gameState: GameState) {
-    socket.on(SOCKET_EVENTS.JOIN_ROOM, (roomCode: string, username: string) => {
+function handleJoinRoom(socket: Socket, io: Server, gameState: GameState) {
+    socket.on(SOCKET_EVENTS.JOIN_ROOM, (payload: { roomCode: string, username: string }) => {
+        const { roomCode, username } = payload;
         if (!(roomCode in gameState)) {
             socket.emit(SOCKET_EVENTS.ROOM_NOT_FOUND, roomCode);
             return;
         }
         socket.join(roomCode);
         const player: Player = {
-            name: username,
+            username: username,
             socketId: socket.id,
             answers: [],
+            accuracy: 0,
             totalQuestionTimeTaken: 0
         }
         gameState[roomCode].players.push(player);
-        socket.emit(SOCKET_EVENTS.ROOM_JOINED, roomCode);
+        const currentPlayerRankings = calculateCurrentPlayerRanking(gameState[roomCode]);
+        const playerJoinedResponse = {
+            roomCode: roomCode,
+            currentPlayerRankings: currentPlayerRankings
+        }
+        io.to(roomCode).emit(SOCKET_EVENTS.PLAYER_RANKING_UPDATED, playerJoinedResponse);
+        const roomJoinedResponse = {
+            roomCode: roomCode,
+            username: username,
+            players: currentPlayerRankings
+        }
+        socket.emit(SOCKET_EVENTS.ROOM_JOINED, roomJoinedResponse);
     })
 }
 
 function handleLeaveRoom(socket: Socket, gameState: GameState) {
-    socket.on(SOCKET_EVENTS.LEAVE_ROOM, (roomCode: string) => {
+    socket.on(SOCKET_EVENTS.LEAVE_ROOM, (payload: { roomCode: string }) => {
+        const { roomCode } = payload;
         if (!(roomCode in gameState)) {
             socket.emit(SOCKET_EVENTS.ROOM_NOT_FOUND, roomCode);
             return;
@@ -76,7 +98,8 @@ function handleLeaveRoom(socket: Socket, gameState: GameState) {
 }
 
 function handleStartGame(socket: Socket, gameState: GameState, io: Server) {
-    socket.on(SOCKET_EVENTS.START_GAME, (roomCode: string) => {
+    socket.on(SOCKET_EVENTS.START_GAME, (payload: { roomCode: string }) => {
+        const { roomCode } = payload;
         if (!(roomCode in gameState)) {
             socket.emit(SOCKET_EVENTS.ROOM_NOT_FOUND, roomCode);
             return;
@@ -97,7 +120,8 @@ function handleStartGame(socket: Socket, gameState: GameState, io: Server) {
 }
 
 function handleAnswerQuestion(socket: Socket, io: Server, gameState: GameState) {
-    socket.on(SOCKET_EVENTS.ANSWER_QUESTION, (roomCode: string, username: string, questionNumber: number, answer: number[]) => {
+    socket.on(SOCKET_EVENTS.ANSWER_QUESTION, (payload: { roomCode: string, username: string, questionNumber: number, answer: number[] }) => {
+        const { roomCode, username, questionNumber, answer } = payload;
         // questionNumber = question being answered (1-indexed)
         if (!(roomCode in gameState)) { // invalid room code
             socket.emit(SOCKET_EVENTS.ROOM_NOT_FOUND, roomCode);
@@ -134,7 +158,20 @@ function handleAnswerQuestion(socket: Socket, io: Server, gameState: GameState) 
             console.log("Next question", nextQuestion);
         }
         const currentPlayerRankings = calculateCurrentPlayerRanking(gameState[roomCode]);
-        socket.emit(SOCKET_EVENTS.QUESTION_ANSWERED, roomCode, username, questionNumber, isCorrect, nextQuestion, currentPlayerRankings);
+        const questionAnsweredResponse = {
+            roomCode: roomCode,
+            username: username,
+            questionNumber: questionNumber,
+            isCorrect: isCorrect,
+            nextQuestion: nextQuestion,
+        }
+        const playerRankingUpdatedResponse = {
+            roomCode: roomCode,
+            currentPlayerRankings: currentPlayerRankings
+        }
+        io.to(roomCode).emit(SOCKET_EVENTS.PLAYER_RANKING_UPDATED, playerRankingUpdatedResponse);
+
+        socket.emit(SOCKET_EVENTS.QUESTION_ANSWERED, questionAnsweredResponse);
         if (gameState[roomCode].numPlayersFinished === gameState[roomCode].players.length) {
             io.to(roomCode).emit(SOCKET_EVENTS.GAME_ENDED, roomCode);
         }
@@ -142,9 +179,10 @@ function handleAnswerQuestion(socket: Socket, io: Server, gameState: GameState) 
 }
 
 function handlePlayerFinished(socket: Socket, io: Server, gameState: GameState) {
-    socket.on(SOCKET_EVENTS.PLAYER_FINISHED, (roomCode: string, username: string) => {
+    socket.on(SOCKET_EVENTS.PLAYER_FINISHED, (payload: { roomCode: string, username: string }) => {
+        const { roomCode, username } = payload;
         const answerResults: AnswerResult[] = [];
-        const ourPlayer = gameState[roomCode].players.find(player => player.name === username);
+        const ourPlayer = gameState[roomCode].players.find(player => player.username === username);
 
         if (!ourPlayer) {
             return;
