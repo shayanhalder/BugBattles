@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import PlayerSidebar from '../../components/PlayerSideBar/PlayerSidebar.tsx';
 import GameSettings from '../../components/GameSettings/GameSettings.tsx';
+import { useGameContext } from '../../types';
 import './Lobby.css';
 import { SOCKET_EVENTS } from '../../types.ts';
 
-interface Player {
-  username: string;
-  socketId: string;
-  accuracy: number;
-  currentQuestion: number;
-}
+// interface Player {
+//   username: string;
+//   socketId: string;
+//   accuracy: number;
+//   currentQuestion: number;
+// }
 
 
 interface GameSettingsData {
@@ -20,7 +21,8 @@ interface GameSettingsData {
   timeLimit: number;
 }
 
-export default function Lobby( { players, socketRef, currentRoomCode, isGameStarted } : any) {
+export default function Lobby() {
+  const { players, socketRef, currentRoomCode, gameStarted } = useGameContext();
 
   const [gameSettings, setGameSettings] = useState<GameSettingsData>({
     programmingLanguage: 'JavaScript',
@@ -60,7 +62,7 @@ export default function Lobby( { players, socketRef, currentRoomCode, isGameStar
   return (
     <div className="lobby-container">
       <div className="lobby-content">
-        <PlayerSidebar players={players} isGameStarted={isGameStarted} />
+        <PlayerSidebar players={players} isGameStarted={gameStarted} />
         <div className="lobby-main">
           {/* <div className="lobby-header">
             <h1>Bug Battles</h1>

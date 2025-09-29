@@ -1,6 +1,8 @@
 import './Home.css'
+import { useGameContext } from '../../types';
 
-export default function Home({ mode, setMode, name, setName, roomCode, setRoomCode, currentRoomCode, setCurrentRoomCode, handleCreateRoom, handleJoinRoom } : any ) {
+export default function Home() {
+  const { mode, setMode, name, setName, roomCode, setRoomCode, currentRoomCode, setCurrentRoomCode, handleCreateRoom, handleJoinRoom } = useGameContext();
   return (
     <div className="main-panel">
         <div className="mode-toggle">

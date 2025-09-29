@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import './App.css'
 import { io, Socket } from "socket.io-client";
-import { SOCKET_EVENTS, type AnswerDeltaInfo, type Question } from './types'
+import { SOCKET_EVENTS, type AnswerDeltaInfo, type Player, type Question, GameContext, type GameContextType } from './types'
 import Lobby from './pages/Lobby/Lobby';
 import Home from './pages/Home/Home';
 import Game from './pages/Game/Game';
@@ -15,7 +15,7 @@ function App() {
   const [currentRoomCode, setCurrentRoomCode] = useState<string>('')
   const [gameStarted, setGameStarted] = useState<boolean>(false)
   const [questions, setQuestions] = useState<Question[]>([])
-  const [players, setPlayers] = useState<{name: string, socketId: string, isHost?: boolean}[]>([])
+  const [players, setPlayers] = useState<Player[]>([])
   const [showAnswerAlert, setShowAnswerAlert] = useState<boolean>(false)
   const [answerIsCorrect, setAnswerIsCorrect] = useState<boolean>(false)
   const [answerResults, setAnswerResults] = useState<AnswerDeltaInfo[]>([])
@@ -59,44 +59,76 @@ function App() {
   }
 
   const renderCurrentView = () => {
+    // displays home, lobby, or game based on the current state of the app
     const viewMap = {
       home: !currentRoomCode && !gameStarted,
       lobby: currentRoomCode && !gameStarted,
-      game: gameStarted,
+      game: gameStarted && currentRoomCode,
       answerResults: answerResults
     };
 
     if (viewMap.game) return (
       <>
-        <Game socketRef={socketRef} currentRoomCode={currentRoomCode} questions={questions} players={players}
-          name={name} answerResults={answerResults} isGameStarted={gameStarted} />
+        {/* <Game socketRef={socketRef} currentRoomCode={currentRoomCode} questions={questions} players={players}
+          name={name} answerResults={answerResults} isGameStarted={gameStarted} /> */}
+          <Game />
       </>
     )
     if (viewMap.lobby) return (
       <>
-        <Lobby players={players} socketRef={socketRef} currentRoomCode={currentRoomCode} isGameStarted={gameStarted} />
+        {/* <Lobby players={players} socketRef={socketRef} currentRoomCode={currentRoomCode} isGameStarted={gameStarted} /> */}
+        <Lobby />
       </>
     )
     return (
-    <>
-      <h1 className="title">BugBattles</h1>
-      <Home mode={mode} setMode={setMode} name={name} setName={setName} 
-          roomCode={roomCode} setRoomCode={setRoomCode} currentRoomCode={currentRoomCode} 
-          setCurrentRoomCode={setCurrentRoomCode} handleCreateRoom={handleCreateRoom} handleJoinRoom={handleJoinRoom}
-          />
-    </>
+      <>
+        <h1 className="title">BugBattles</h1>
+        {/* <Home mode={mode} setMode={setMode} name={name} setName={setName} 
+            roomCode={roomCode} setRoomCode={setRoomCode} currentRoomCode={currentRoomCode} 
+            setCurrentRoomCode={setCurrentRoomCode} handleCreateRoom={handleCreateRoom} handleJoinRoom={handleJoinRoom}
+            /> */}
+        <Home />
+      </>
     )
   }
+  
+  const value: GameContextType = {
+    name,
+    setName,
+    mode,
+    setMode,
+    roomCode,
+    setRoomCode,
+    currentRoomCode,
+    setCurrentRoomCode,
+    gameStarted,
+    setGameStarted,
+    questions,
+    setQuestions,
+    players,
+    setPlayers,
+    showAnswerAlert,
+    setShowAnswerAlert,
+    answerIsCorrect,
+    setAnswerIsCorrect,
+    answerResults,
+    setAnswerResults,
+    handleCreateRoom,
+    handleJoinRoom,
+    socketRef
+  };
 
 
   return (
     <div className="app">
-      {renderCurrentView()}
-      <AnswerAlert 
-        isVisible={showAnswerAlert} 
-        isCorrect={answerIsCorrect} 
-        onClose={() => setShowAnswerAlert(false)} 
-      />
+      <GameContext.Provider value={value}>
+        {renderCurrentView()}
+        <AnswerAlert 
+          isVisible={showAnswerAlert} 
+          isCorrect={answerIsCorrect} 
+          onClose={() => setShowAnswerAlert(false)} 
+        />
+      </GameContext.Provider>
     </div>
   )
 }

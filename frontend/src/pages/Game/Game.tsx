@@ -4,8 +4,10 @@ import PlayerSidebar from '../../components/PlayerSideBar/PlayerSidebar'
 import { useState } from 'react'
 import { SOCKET_EVENTS } from '../../types';
 import AnswerResults from '../../components/AnswerResults/AnswerResults';
+import { useGameContext } from '../../types';
 
-export default function Game({ socketRef, currentRoomCode, questions, players, name, answerResults, isGameStarted } : any ) {
+export default function Game() {
+    const { socketRef, currentRoomCode, questions, players, name, answerResults, gameStarted } = useGameContext();
     const [selectedLines, setSelectedLines] = useState<number[]>([]);
     const currentQuestion = questions[questions.length - 1]
 
@@ -16,13 +18,13 @@ export default function Game({ socketRef, currentRoomCode, questions, players, n
             questionNumber: questions.length,
             answer: selectedLines
         }
-        socketRef.current.emit(SOCKET_EVENTS.ANSWER_QUESTION, payload)
+        socketRef?.current?.emit(SOCKET_EVENTS.ANSWER_QUESTION, payload)
         setSelectedLines([])
     }
     
     return (
         <div className="game-container">
-            <PlayerSidebar players={players} isGameStarted={isGameStarted} />
+            <PlayerSidebar players={players} isGameStarted={gameStarted} />
             <div className="game-main">
                 {
                     currentQuestion && (
